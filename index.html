@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>vector2svg</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+    <link rel="stylesheet" href="css/material.blue-orange.min.css"/>
+    <link rel="stylesheet" href="css/github-gist.css"/>
+    <link rel="stylesheet" href="css/dialog-polyfill.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
+
+</head>
+<body>
+<div class="mdl-grid">
+    <div class="mdl-cell mdl-cell--2-col"></div>
+    <div class="mdl-color--white mdl-shadow--4dp content mdl-color-text--grey-800 mdl-cell mdl-cell--8-col" style="padding-right: 100px">
+        <h2 style="font-weight: bold" class="mdl-color-text--red-500 unselectabl content-center">vector to svg converter</h2>
+        <div id="uploadSpaceSmall" class="gone unselectable">
+            <div class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect button-upload-small pasteXml">PASTE XML</div>
+            <div class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect button-upload-small pasteUrl">OPEN FROM URL</div>
+            <div class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect button-upload-small" onclick="$('#uploadFile').click()">UPLOAD FILE</div>
+            <span class="content-center h4 uploadHint">Drag here</span>
+        </div>
+        <br><br>
+        <div id="uploadSpace" class="unselectable" style="position:relative;">
+            <div class="center">
+                <i class="material-icons" style="font-size: 80px; color: #757575;">file_upload</i>
+                <h5 class="uploadHint">Drag and drop file here</h5>
+                <div class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect button-upload-big" onclick="$('#uploadFile').click()">UPLOAD FILE</div>
+                <br>
+                <div class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect button-upload-big pasteUrl">OPEN FROM URL</div>
+                <br>
+                <div class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect button-upload-big pasteXml">PASTE XML</div>
+            </div>
+        </div>
+        <div style="width:100%;" class="gone" id="previewDiv">
+            <div style="width:50%;float: left; overflow-x: auto">
+                <h6 class="content-center">SVG output</h6>
+                <div class="content-center">
+                    <button class="mdl-button mdl-js-button mdl-button--accent mdl-js-ripple-effect" id="copy-svg">
+                        <i class="material-icons">content_copy</i> Copy
+                    </button>
+                </div>
+                <div id="svg-code-container">
+                    <pre><code class="xml" id="code"></code></pre>
+                </div>
+            </div>
+            <div style="width:50%;float: right;">
+                <h6 class="content-center">Preview</h6>
+                <div class="content-center">
+                    <button class="mdl-button mdl-js-button mdl-button--accent mdl-js-ripple-effect" id="save-svg">
+                        <i class="material-icons">save</i> Save
+                    </button>
+                </div>
+                <div id="preview" class="content-center"></div>
+            </div>
+        </div>
+        <div id="errorDiv" class="mdl-shadow--4dp mdl-button gone">
+            <i class="material-icons" style="font-size: 36px">warning</i>An error has occurred.
+            <font id="error"></font>
+        </div>
+    </div>
+</div>
+<dialog class="mdl-dialog">
+    <div class="mdl-dialog__content">
+        <div class="urlDialog">
+            <form action="#">
+                <div class="mdl-textfield mdl-js-textfield">
+                    <input class="mdl-textfield__input" type="text" id="edittext1">
+                    <label class="mdl-textfield__label" for="edittext1">URL</label>
+                </div>
+            </form>
+
+            <div id="load-url">
+                <div class="mdl-spinner mdl-js-spinner is-active"></div>
+                Loading...
+            </div>
+        </div>
+        <div class="xmlDialog">
+            <p>Paste XML code below</p>
+            <form action="#">
+                <div class="mdl-textfield mdl-js-textfield">
+                    <textarea class="mdl-textfield__input" type="text" rows="3" id="pastedxml"></textarea>
+                    <label class="mdl-textfield__label" for="pastedxml">XML</label>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="mdl-dialog__actions">
+        <button type="button" class="mdl-button dialog-ok-btn">OK</button>
+        <button type="button" class="mdl-button close">Cancel</button>
+    </div>
+</dialog>
+<div id="toast" class="mdl-js-snackbar mdl-snackbar">
+    <div class="mdl-snackbar__text"></div>
+    <button class="mdl-snackbar__action" type="button"></button>
+</div>
+<footer>
+    <div class="content-center">
+        <button class="mdl-button mdl-js-button mdl-js-ripple-effect" id="github">
+            <img src="res/github.svg"> GitHub
+        </button>
+    </div>
+</footer>
+<input type="file" id="uploadFile" style="opacity: 0;display:none">
+
+<script defer src="js/material.min.js"></script>
+<script src="js/jquery-3.1.1.min.js"></script>
+<script src='js/filereader.js'></script>
+<script src='js/dialog-polyfill.js'></script>
+<script src='js/clipboard.min.js'></script>
+<script src='js/FileSaver.min.js'></script>
+<script src='js/highlight.pack.js'></script>
+<script src='js/main.js'></script>
+
+<script>
+    (function () {
+        'use strict';
+        var snackbarContainer = document.querySelector('#toast');
+        $("#copy-svg").click(function () {
+            'use strict';
+            var data = {message: 'Text copied into clipboard'};
+            snackbarContainer.MaterialSnackbar.showSnackbar(data);
+        })
+    }());
+
+    var dialog = document.querySelector('dialog');
+    if (!dialog.showModal) {
+        dialogPolyfill.registerDialog(dialog);
+    }
+
+    $(".pasteUrl").click(function () {
+        dialog.showModal();
+        $(".mdl-textfield__input").val("");
+        $("#load-url").addClass("gone");
+        $(".urlDialog").removeClass("gone");
+        $(".xmlDialog").addClass("gone");
+    });
+
+    $(".pasteXml").click(function () {
+        dialog.showModal();
+        $("#pastedxml").val("");
+        $(".xmlDialog").removeClass("gone");
+        $(".urlDialog").addClass("gone");
+    });
+
+    $(".dialog-ok-btn").click(function () {
+        if ($(".xmlDialog").hasClass("gone")) {
+            // Url input
+
+            var url = $(".mdl-textfield__input").val();
+            $("#load-url").removeClass("gone");
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.overrideMimeType('text/plain; charset=x-user-defined');
+            xhr.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    fileName = "image";
+                    read(this.responseText);
+                } else {
+                    showError("Cannot reach url");
+                }
+
+                try {
+                    dialog.close();
+                } catch (e) {
+                }
+            };
+
+            xhr.send();
+        } else {
+            // Xml input
+            var xml = $("#pastedxml").val();
+
+            fileName = "image";
+            if (xml.length != 0)
+                read(xml);
+
+            dialog.close();
+        }
+    });
+
+    $(".close").click(function () {
+        dialog.close();
+    });
+
+</script>
+
+</body>
+</html>

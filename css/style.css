@@ -1,0 +1,81 @@
+body {
+    background-color: #2196f3;
+    min-height: 0 !important;
+}
+
+.content {
+    border-radius: 2px;
+    padding: 50px 50px;
+}
+
+#uploadSpace, #uploadSpaceSmall {
+    width: 100%;
+    border: 6px dashed #BDBDBD;
+    border-radius: 6px !important;
+    box-shadow: 0 0 0 0 !important;
+    height: 500px;
+    margin: 0 !important;
+    padding: 10px;
+    text-align: center !important;
+}
+
+.button-upload-small {
+    margin-left: 10px;
+    float: right;
+}
+
+.button-upload-big {
+    margin-top: 10px;
+}
+
+#uploadSpaceSmall {
+    padding: 15px !important;
+    border: 3px dashed #BDBDBD !important;
+    height: 35px !important;
+}
+
+.uploadHint {
+    color: #757575;
+    text-transform: none !important;
+}
+
+.center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#errorDiv {
+    background-color: #d32f2f;
+    color: white;
+    cursor: default;
+    display: table;
+    margin-top: 4%;
+    padding: 15px;
+    width: 100%;
+}
+
+.gone {
+    display: none !important;
+}
+
+*.unselectable {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.drag {
+    background-color: #75757575;
+}
+
+#github {
+    width: 100px !important;
+    height: 100px !important;
+}
+
+.content-center {
+    text-align: center;
+}
